@@ -78,6 +78,8 @@ impl TryFrom<u8> for OperatingMode {
 /// Extracted from status byte bits 3:1.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CommandStatus {
+    // Reserved
+    RUF = 0x1,
     /// Data is available to be read from the radio
     DataAvailable = 0x2,
     /// Command timed out during execution
@@ -95,6 +97,7 @@ impl TryFrom<u8> for CommandStatus {
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
+            0x1 => Ok(Self::RUF),
             0x2 => Ok(Self::DataAvailable),
             0x3 => Ok(Self::Timeout),
             0x4 => Ok(Self::ProcessingError),
@@ -259,7 +262,7 @@ impl FromByteArray for GetRxBufferStatusResponse {
     fn from_bytes(bytes: Self::Array) -> Result<Self, Self::Error> {
         Ok(Self {
             status: Status::from_bytes([bytes[0]]).unwrap(),
-            buffer_status: RxBufferStatus::from_bytes([bytes[1], bytes[2]]).unwrap(),
+            buffer_status: RxBufferStatus::from_bytes([bytes[1], bytes[2]])?,
         })
     }
 }
@@ -344,7 +347,7 @@ impl FromByteArray for GetPacketStatusResponse {
     fn from_bytes(bytes: Self::Array) -> Result<Self, Self::Error> {
         Ok(Self {
             status: Status::from_bytes([bytes[0]]).unwrap(),
-            packet_status: PacketStatus::from_bytes([bytes[1], bytes[2], bytes[3]]).unwrap(),
+            packet_status: PacketStatus::from_bytes([bytes[1], bytes[2], bytes[3]])?,
         })
     }
 }
@@ -436,7 +439,7 @@ impl FromByteArray for GetDeviceErrorsResponse {
     fn from_bytes(bytes: Self::Array) -> Result<Self, Self::Error> {
         Ok(Self {
             status: Status::from_bytes([bytes[0]]).unwrap(),
-            errors: DeviceErrors::from_bytes([bytes[1], bytes[2]]).unwrap(),
+            errors: DeviceErrors::from_bytes([bytes[1], bytes[2]])?,
         })
     }
 }
@@ -565,8 +568,7 @@ impl FromByteArray for GetStatsResponse {
     fn from_bytes(bytes: Self::Array) -> Result<Self, Self::Error> {
         Ok(Self {
             status: Status::from_bytes([bytes[0]]).unwrap(),
-            stats: Stats::from_bytes([bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6]])
-                .unwrap(),
+            stats: Stats::from_bytes([bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6]])?,
         })
     }
 }

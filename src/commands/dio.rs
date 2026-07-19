@@ -143,7 +143,7 @@ impl FromByteArray for GetIrqStatusResponse {
     fn from_bytes(bytes: Self::Array) -> Result<Self, Self::Error> {
         Ok(Self {
             status: Status::from_bytes([bytes[0]]).unwrap(),
-            irq_mask: IrqMask::from_bytes([bytes[1], bytes[2]]).unwrap(),
+            irq_mask: IrqMask::from_bytes([bytes[1], bytes[2]])?,
         })
     }
 }

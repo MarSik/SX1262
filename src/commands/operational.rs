@@ -319,13 +319,12 @@ pub struct RxDutyCycleConfig {
 
 impl ToByteArray for RxDutyCycleConfig {
     type Error = Infallible;
-    type Array = [u8; 8];
+    type Array = [u8; 6];
 
     fn to_bytes(self) -> Result<Self::Array, Self::Error> {
-        let mut bytes = [0u8; 8];
-        bytes[0..4].copy_from_slice(&self.rx_period.to_be_bytes());
-        bytes[4..8].copy_from_slice(&self.sleep_period.to_be_bytes());
-        Ok(bytes)
+        let rx = self.rx_period.to_be_bytes();
+        let sl = self.sleep_period.to_be_bytes();
+        Ok([rx[1], rx[2], rx[3], sl[1], sl[2], sl[3]])
     }
 }
 
